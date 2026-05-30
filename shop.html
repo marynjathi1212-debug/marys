@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop | UrbanThreads</title>
+    <style>
+        /* --- CSS VARIABLES & RESET (Shared with index.html) --- */
+        :root {
+            --primary: #1a1a1a;
+            --accent: #d4a373;
+            --light: #f4f4f4;
+            --dark: #333;
+            --white: #fff;
+            --success: #28a745;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-main); background: var(--light); color: var(--dark); line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+        button { cursor: pointer; border: none; font-family: inherit; }
+
+        /* --- NAVIGATION --- */
+        header {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
+        .logo span { color: var(--accent); }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { font-weight: 500; transition: var(--transition); }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-links a.active { color: var(--accent); font-weight: 700; }
+
+        .nav-icons { display: flex; gap: 1.5rem; align-items: center; }
+        .cart-icon { position: relative; font-size: 1.2rem; cursor: pointer; }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: var(--white);
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Mobile Menu */
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+        .bar { width: 25px; height: 3px; background: var(--primary); transition: var(--transition); }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: var(--white);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: var(--transition);
+                box-shadow: inset 0 5px 10px rgba(0,0,0,0.05);
+                z-index: 999;
+            }
+            .nav-links.active { right: 0; }
+            .hamburger { display: flex; }
+            .hamburger.active .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+            .hamburger.active .bar:nth-child(2) { opacity: 0; }
+            .hamburger.active .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
+        }
+
+        /* --- SHOP LAYOUT --- */
+        .shop-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 5%;
+            gap: 2rem;
+        }
+
+        /* Sidebar Filters */
+        .filters-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .filter-group { margin-bottom: 2rem; }
+        .filter-group h3 { font-size: 1rem; margin-bottom: 1rem; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 0.5rem; }
+        
+        .filter-option { display: flex; align-items: center; margin-bottom: 0.8rem; cursor: pointer; }
+        .filter-option input { margin-right: 10px; accent-color: var(--accent); }
+        
+        .price-range { display: flex; align-items: center; gap: 10px; }
+        .price-range input { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+
+        .sort-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            background: var(--white);
+            font-weight: 500;
+        }
+
+        /* Product Grid */
+        .shop-content { flex-grow: 1; }
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .product-count { color: #666; }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        
+        .product-img-wrapper { position: relative; overflow: hidden; height: 300px; }
+        .product-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .product-card:hover .product-img { transform: scale(1.05); }
+        
+        .badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--accent);
+            color: var(--white);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .product-info { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .product-cat { color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
+        .product-title { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 600; }
+        .product-price { font-size: 1.2rem; color: var(--accent); font-weight: 700; margin-top: auto; }
+
+        /* --- PRODUCT MODAL (Quick View) --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 3000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal.open { display: flex; }
+        
+        .modal-content {
+            background: var(--white); width: 90%; max-width: 900px;
+            border-radius: 8px; overflow: hidden; display: flex;
+            position: relative; max-height: 90vh;
+        }
+        
+        .modal-img { width: 50%; height: 100%; object-fit: cover; background: #eee; }
+        .modal-details { width: 50%; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; }
+        
+        .close-modal {
+            position: absolute; top: 15px; right: 20px; font-size: 2rem;
+            cursor: pointer; color: var(--dark); z-index: 10;
+        }
+
+        .size-selector { display: flex; gap: 10px; margin: 1rem 0; }
+        .size-btn {
+            width: 40px; height: 40px; border: 1px solid #ddd;
+            background: #fff; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: var(--transition); border-radius: 4px;
+        }
+        .size-btn:hover, .size-btn.active { border-color: var(--accent); background: var(--accent); color: var(--white); }
+
+        .add-to-cart-btn {
+            width: 100%; padding: 1rem; background: var(--primary); color: var(--white);
+            font-weight: 600; border-radius: 4px; margin-top: 1rem; transition: var(--transition);
+        }
+        .add-to-cart-btn:hover { background: #333; }
+
+        /* Cart Drawer (Same as index.html) */
+        .cart-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            opacity: 0; visibility: hidden; transition: var(--transition);
+        }
+        .cart-overlay.open { opacity: 1; visibility: visible; }
+
+        .cart-drawer {
+            position: fixed; top: 0; right: -400px; width: 100%; max-width: 400px;
+            height: 100%; background: var(--white); z-index: 2001;
+            transition: var(--transition); display: flex; flex-direction: column;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        }
+        .cart-drawer.open { right: 0; }
+
+        .cart-header { padding: 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .close-cart { font-size: 1.5rem; cursor: pointer; }
+        .cart-items { flex-grow: 1; overflow-y: auto; padding: 1.5rem; }
+        .cart-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; }
+        .cart-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; }
+        .item-details { flex-grow: 1; }
+        .item-title { font-weight: 600; font-size: 0.9rem; }
+        .item-price { color: var(--accent); font-size: 0.9rem; }
+        .item-qty { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+        .qty-btn { width: 25px; height: 25px; background: #eee; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        .cart-footer { padding: 1.5rem; border-top: 1px solid #eee; background: #fafafa; }
+        .total-row { display: flex; justify-content: space-between; font-weight: 700; font-size: 1.2rem; margin-bottom: 1rem; }
+        .checkout-btn { width: 100%; padding: 1rem; background: var(--accent); color: var(--white); font-weight: 600; border-radius: 4px; }
+        .checkout-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .shop-container { flex-direction: column; padding: 2rem 5%; }
+            .filters-sidebar { width: 100%; position: static; margin-bottom: 1rem; }
+            .modal-content { flex-direction: column; max-height: 95vh; }
+            .modal-img, .modal-details { width: 100%; height: auto; }
+            .modal-img { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">Urban<span>Threads</span></div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index4.html">Home</a></li>
+                <li><a href="shop.html" class="active">Shop</a></li>
+            
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <div class="cart-icon" id="cartIcon">
+                    🛒
+                    <span class="cart-count" id="cartCount">0</span>
+                </div>
+                <div class="hamburger" id="hamburger">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    
+                
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <!-- SHOP CONTAINER -->
+    <div class="shop-container">
+        
+        <!-- SIDEBAR FILTERS -->
+        <aside class="filters-sidebar">
+            <div class="filter-group">
+                <h3>Categories</h3>
+                <label class="filter-option">
+                    <input type="radio" name="category" value="all" checked> All Products
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="category" value="clothing"> Clothing
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="category" value="shoes"> Shoes
+                </label>
+            </div>
+
+            <div class="filter-group">
+                <h3 >Price Range</h3>
+                <label class="filter-option">
+                    <input type="radio" name="price" value="all" checked> All Prices
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="price" value="0-25"> $0 - $25
+                </label>
+                <label class="filter-option">
+                    <input type="radio" name="price" value="25-50"> $25 - $50
+                </label>
+            </div>
+
+</aside>
+
+        <!-- SHOP CONTENT -->
+        <section class="shop-content">
+            <div class="shop-header">
+                <h2>Our Products</h2>
+                <div class="product-count">Showing 12 products</div>
+            </div>
+
+            <div class="product-grid">
+                <!-- PRODUCT CARD EXAMPLE -->
+                <div class="product-card">
+                    <div class="product-img-wrapper">
+                        <img src="C:\Users\DELL\Desktop\image\stores.jpg" alt="Product Image" class="product-img">
+                        
+                        <div class="badge">New</div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-cat">Clothing</div>
+                        <h3 class="product-title">CLOTHES</h3>
+                        <div class="product-price">$59.99</div>
+                        <button class="quick-view-btn" data-product-id="1">Quick View</button>
+                   <div class="product-card">
+                    <div class="product-img-wrapper">
+                        <img src="C:\Users\DELL\Desktop\image\shirts.jpg" alt="Product Image" class="product-img">
+                        
+                        <div class="badge">New</div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-cat">Clothing</div>
+                        <h3 class="product-title">Classic T-Shirt</h3>
+                        <div class="product-price">$19.99</div>
+                        <button class="quick-view-btn" data-product-id="1">Quick View</button>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-img-wrapper">
+                        <img src="C:\Users\DELL\Desktop\image\sneakers.jpg" alt="Product Image" class="product-img">
+                        
+                        <div class="badge">New</div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-cat">Clothing</div>
+                        <h3 class="product-title">SNEAKERS</h3>
+                        <div class="product-price">$89.99</div>
+                        <button class="quick-view-btn" data-product-id="1">Quick View</button>
+                    </div>
+                </div>
+
+                <!-- Repeat product cards as needed -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- PRODUCT MODAL (QUICK VIEW) -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <img src="C:\Users\DELL\Desktop\image\shirts.jpg" alt="Product Image" class="modal-img">
+            <div class="modal-details">
+                <h2>Classic T-Shirt</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <div class="size-selector">
+                    <button class="size-btn">S</button>
+                    <button class="size-btn">M</button>
+                    <button class="size-btn">L</button>
+                    <button class="size-btn">XL</button>
+                </div>
+                <button class="add-to-cart-btn">Add to Cart - $19.99</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART DRAWER (Same as index.html) -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <aside class="cart-drawer" id="cartDrawer">
+        <!-- Cart content goes here -->
+    </aside>
+
+    <!-- JavaScript for interactivity (e.g., mobile menu, modal, cart) would go here -->
+    <script>
+         // --- DATA & STATE ---
+        const products = [
+            { id: 1, name: "Urban Hoodie", category: "clothing", price: 59.99, image: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" },
+            { id: 2, name: "Street Sneaker", category: "shoes", price: 89.99, image: "https://images.unsplash.com/photo-1519741499290-9cdbd9a3c8e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" },
+            { id: 3, name: "Denim Jacket", category: "clothing", price: 79.99, image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" },
+            { id: 4, name: "Canvas Sneakers", category: "shoes", price: 69.99, image: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" },
+            { id: 5, name: "Graphic Tee", category: "clothing", price: 29.99, image: "https://images.unsplash.com/photo-1519741499290-9cdbd9a3c8e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" },
+            { id: 6, name: "High-top Sneakers", category: "shoes", price: 99.99, image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" }
+        ];
+        // Mobile Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Product Modal (Quick View)
+        const productCards = document.querySelectorAll('.product-card');
+        const productModal = document.getElementById('productModal');
+        const closeModal = document.getElementById('closeModal');
+
+        productCards.forEach(card => {
+            card.addEventListener('click', () => {
+                productModal.classList.add('open');
+            });
+        });
+
+        closeModal.addEventListener('click', () => {
+            productModal.classList.remove('open');
+        });
+
+        // Cart Drawer Toggle
+        const cartIcon = document.getElementById('cartIcon');
+        const cartOverlay = document.getElementById('cartOverlay');
+        const cartDrawer = document.getElementById('cartDrawer');
+
+        cartIcon.addEventListener('click', () => {
+            cartOverlay.classList.add('open');
+            cartDrawer.classList.add('open');
+        });
+
+        cartOverlay.addEventListener('click', () => {
+            cartOverlay.classList.remove('open');
+            cartDrawer.classList.remove('open');
+        });
+    </script>
+</body>
+</html>

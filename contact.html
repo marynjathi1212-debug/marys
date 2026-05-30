@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | UrbanThreads</title>
+    <style>
+        /* --- CSS VARIABLES & RESET (Shared) --- */
+        :root {
+            --primary: #1a1a1a;
+            --accent: #d4a373;
+            --light: #f4f4f4;
+            --dark: #333;
+            --white: #fff;
+            --success: #28a745;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-main); background: var(--light); color: var(--dark); line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+        button { cursor: pointer; border: none; font-family: inherit; }
+
+        /* --- NAVIGATION --- */
+        header {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
+        .logo span { color: var(--accent); }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { font-weight: 500; transition: var(--transition); }
+        .nav-links a:hover { color: var(--accent); }
+        .nav-links a.active { color: var(--accent); font-weight: 700; }
+
+        .nav-icons { display: flex; gap: 1.5rem; align-items: center; }
+        .cart-icon { position: relative; font-size: 1.2rem; cursor: pointer; }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: var(--white);
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Mobile Menu */
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+        .bar { width: 25px; height: 3px; background: var(--primary); transition: var(--transition); }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: var(--white);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: var(--transition);
+                box-shadow: inset 0 5px 10px rgba(0,0,0,0.05);
+                z-index: 999;
+            }
+            .nav-links.active { right: 0; }
+            .hamburger { display: flex; }
+            .hamburger.active .bar:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+            .hamburger.active .bar:nth-child(2) { opacity: 0; }
+            .hamburger.active .bar:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
+        }
+
+        /* --- PAGE HEADER --- */
+        .page-header {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 40vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .page-header h1 { font-size: 3rem; margin-bottom: 0.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .page-header p { font-size: 1.2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+        /* --- CONTACT SECTION --- */
+        .contact-container {
+            max-width: 1200px;
+            margin: -50px auto 4rem;
+            padding: 0 5%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .contact-wrapper {
+            display: flex;
+            gap: 2rem;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Left: Form */
+        .contact-form {
+            flex: 1;
+            padding: 3rem;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark); }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.2);
+        }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .submit-btn:hover { background: #333; transform: translateY(-2px); }
+
+        /* Right: Info */
+        .contact-info {
+            flex: 1;
+            background: var(--primary);
+            color: var(--white);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .info-item { margin-bottom: 2rem; }
+        .info-item h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--accent); }
+        .info-item p, .info-item a { color: #ccc; font-size: 0.95rem; }
+        .info-item a:hover { color: var(--white); text-decoration: underline; }
+
+        .social-links { display: flex; gap: 1rem; margin-top: 1rem; }
+        .social-link {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition);
+        }
+        .social-link:hover { background: var(--accent); color: var(--white); }
+
+        /* Map Placeholder */
+        .map-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 2rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            text-align: center;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .contact-wrapper { flex-direction: column; }
+            .contact-form, .contact-info { padding: 2rem; }
+            .page-header { height: 30vh; }
+            .page-header h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">Urban<span>Threads</span></div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index4.html">Home</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <div class="cart-icon" id="cartIcon">
+                    🛒
+                    <span class="cart-count" id="cartCount">0</span>
+                </div>
+                <div class="hamburger" id="hamburger">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+        <div>
+            <h1>Get in Touch</h1>
+            <p>We'd love to hear from you. Send us a message!</p>
+        </div>
+    </section>
+
+    <!-- CONTACT CONTAINER -->
+    <div class="contact-container">
+        <div class="contact-wrapper">
+            
+            <!-- CONTACT FORM -->
+            <div class="contact-form">
+                <h2 style="margin-bottom: 1.5rem; color: var(--primary);">Send us a Message</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" required placeholder="John Doe">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" required placeholder="john@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <select id="subject" required>
+                            <option value="">Select a topic</option>
+                            <option value="order">Order Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="partnership">Partnership</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" required placeholder="How can we help you?"></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Send Message</button>
+                    
+                    <div id="successMessage" class="success-message">
+                        <strong>Message Sent!</strong> We'll get back to you within 24 hours.
+                    </div>
+                </form>
+            </div>
+
+            <!-- CONTACT INFO -->
+            <div class="contact-info">
+                <div class="info-item">
+                    <h3>Visit Our Store</h3>
+                    <p>123 Sustainable Street<br>Urban District, NY 10012<br>United States</p>
+                </div>
+
+                <div class="info-item">
+                    <h3>Contact Info</h3>
+                    <p>+25479765334</p>
+                    <p>support@urbanthreads.com</p>
+                </div>
+
+                <div class="info-item">
+                    <h3>Business Hours</h3>
+                    <p>Mon - Fri: 9:00 AM - 8:00 PM</p>
+                    <p>Sat: 10:00 AM - 6:00 PM</p>
+                    <p>Sun: Closed</p>
+                </div>
+
+                <div class="social-links">
+                    <a href="#" class="social-link" title="Instagram">IG</a>
+                    <a href="#" class="social-link" title="Twitter">TW</a>
+                    <a href="#" class="social-link" title="Facebook">FB</a>
+                    <a href="#" class="social-link" title="LinkedIn">LI</a>
+                </div>
+
+                <div class="map-placeholder">
+                    [Interactive Map Loading...]
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CART DRAWER (Shared Logic) -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <div class="close-cart" id="closeCart">&times;</div>
+        </div>
+        <div class="cart-items" id="cartItemsContainer">
+            <!-- Cart items injected here -->
+        </div>
+        <div class="cart-footer">
+            <div class="total-row">
+                <span>Total:</span>
+                <span id="cartTotal">$0.00</span>
+            </div>
+            <button class="checkout-btn" id="checkoutBtn" disabled>Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        // --- SHARED DATA & STATE ---
+        const products = [
+            { id: 1, name: "Urban Hoodie", category: "clothing", price: 89.99, image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { id: 2, name: "Cargo Pants", category: "clothing", price: 79.99, image: "https://images.unsplash.com/photo-1517445312882-563c9842a7a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { id: 3, name: "Sneakers", category: "footwear", price: 129.99, image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { id: 4, name: "Denim Jacket", category: "clothing", price: 119.99, image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { id: 5, name: "Backpack", category: "accessories", price: 59.99, image: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { id: 6, name: "Baseball Cap", category: "accessories", price: 29.99, image: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+
+    </script>   
+</body>
+</html>
+
+
